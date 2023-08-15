@@ -1,0 +1,7 @@
+{
+    "scripts": {
+        "start api": "node api/app.js",
+        "start web": "",
+        "start": "node api/app.js"
+    }
+}
