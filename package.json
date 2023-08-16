@@ -1,7 +1,10 @@
 {
     "scripts": {
-        "start api": "node api/app.js",
-        "start web": "",
-        "start": "node api/app.js"
+        "api": "node api/app.js",
+        "web": "cd web && ng serve",
+        "start": "concurrently \"npm run api\" \"npm run web\""
+    },
+    "dependencies": {
+        "concurrently": "^8.2.0"
     }
 }

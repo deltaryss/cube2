@@ -103,7 +103,7 @@ function parseHexData(hexString) {
       rssi: rssi,
     };
   } else {
-    console.error('The "' + hexString + '" data is not valid');
+    return false
   }
 }
 // Envois des données à la base de données MySQL
@@ -154,6 +154,12 @@ const fetchDataAndProcess = async () => {
     rawData.map(async (item) => {
       const [idReleve, hexData, dateReleve] = item;
 
+      if (debug) console.log("-------------------------------------------------------------------------------------------------------------------------------------");
+      if (debug) console.log("Récupération des données depuis l'API");
+      if (debug) console.log("idReleve :", idReleve);
+      if (debug) console.log("hexData :", hexData);
+      if (debug) console.log("dateReleve :", dateReleve);
+
       checkDuplicateData(idReleve, hexData, (error, hasDuplicate) => {
         if (error) {
           console.error("Erreur lors de la vérification des doublons :", error);
@@ -162,15 +168,11 @@ const fetchDataAndProcess = async () => {
         }
 
         if (hasDuplicate) {
-          if (debug) console.log("-------------------------------------------------------------------------------------------------------------------------------------");
+          
           console.log("Doublon détecté, les données ne seront pas envoyées.");
           if (debug) console.log("idReleve :", idReleve, "hexData :", hexData,);
           if (debug) console.log("-------------------------------------------------------------------------------------------------------------------------------------");
         } else {
-          if (debug) console.log("-------------------------------------------------------------------------------------------------------------------------------------");
-          if (debug) console.log("Récupération des données depuis l'API");
-          if (debug) console.log("idReleve :", idReleve);
-          if (debug) console.log("hexData :", hexData);
           // Traitement des données
           const data = parseHexData(hexData);
           const formattedDate = moment(
@@ -179,6 +181,9 @@ const fetchDataAndProcess = async () => {
           ).format("YYYY-MM-DD HH:mm:ss");
 
           // Insérer les données dans la base de données
+          if (!data) {
+            console.error('The "' + hexData + '" data is not valid');
+          } else {
           insertDataIntoDatabase(
             idReleve,
             data.idSonde,
@@ -189,6 +194,7 @@ const fetchDataAndProcess = async () => {
             formattedDate,
             hexData
           );
+          }
           if (debug) console.log("-------------------------------------------------------------------------------------------------------------------------------------");
         }
       });
@@ -207,7 +213,8 @@ setInterval(fetchDataAndProcess, 60000);
 
 // Endpoints
 app.get('/data', (req, res) => {
-  const query = 'SELECT * FROM ma_table ORDER BY id DESC LIMIT ?';
+  const query = 
+  'SELECT * FROM ' + db.escapeId(config.table) + ' ORDER BY id DESC LIMIT ?';
   const limit = parseInt(req.query.limit) || 10; // Paramètre optionnel pour le nombre de données à renvoyer
 
   db.query(query, [limit], (error, results) => {
@@ -221,18 +228,27 @@ app.get('/data-sse', (req, res) => {
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
 
-  const query = 'SELECT * FROM ma_table ORDER BY id DESC LIMIT 1';
+  const query = 'SELECT * FROM ' + db.escapeId(config.table) + ' ORDER BY id DESC LIMIT 1';
 
   const sendUpdate = () => {
-    connection.query(query, (error, results) => {
+    db.query(query, (error, results) => {
       if (error) throw error;
       if (results.length > 0) {
-        res.write(`data: ${JSON.stringify(results[0])}\n\n`);
+        var previousData = results[0];
+
+        if (previousData == results[0]) {
+          // Données identiques, ne pas envoyer de mise à jour
+          return;
+        } else {
+          // Données différentes, envoyer une mise à jour
+          previousData = results[0];
+          res.write(`data: ${JSON.stringify(results[0])}\n\n`);
+        }
       }
     });
   };
 
-  const intervalId = setInterval(sendUpdate, 5000); // Envoie une mise à jour toutes les 5 secondes
+  const intervalId = setInterval(sendUpdate, 60000); // Envoie une mise à jour toutes les 60 secondes
 
   req.on('close', () => {
     clearInterval(intervalId);
