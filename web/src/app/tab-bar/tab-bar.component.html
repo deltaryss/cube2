@@ -1,0 +1,7 @@
+<div class="tarBar">
+  <div class="listeSonde">
+    <div class="sonde" *ngFor="let sonde of sondeList">
+      <div class="sondeName" (click)="selectData(sonde)">{{sonde}}</div>
+    </div>
+  </div>
+</div>

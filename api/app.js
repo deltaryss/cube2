@@ -3,10 +3,12 @@ const axios = require("axios");
 const bodyParser = require("body-parser");
 const mysql = require("mysql");
 const config = require("./config.js");
+const cors = require('cors');
 const moment = require("moment");
 
 const app = express();
 app.use(bodyParser.json());
+app.use(cors());
 const debug = config.debug || false;
 
 // Configuration de la base de données MySQL
@@ -46,7 +48,9 @@ const connectDb = db.connect((err) => {
 // Vérification de doublon de données
 function checkDuplicateData(idReleve, hexData, callback) {
   const query =
-  'SELECT COUNT(*) AS count FROM ' + db.escapeId(config.table) + ' WHERE id_record = ? OR raw_data = ?';
+    "SELECT COUNT(*) AS count FROM " +
+    db.escapeId(config.table) +
+    " WHERE id_record = ? OR raw_data = ?";
 
   db.query(query, [idReleve, hexData], (error, results) => {
     if (error) {
@@ -75,25 +79,25 @@ function parseHexData(hexString) {
     };
 
     var dataLength = data.slice(4, 8);
-    if (debug) console.log('dataLength: ' + dataLength);
+    if (debug) console.log("dataLength: " + dataLength);
 
     // TAG starts at 76
 
     var TAG = data.slice(76, hexString.length - 12);
-    if (debug) console.log('TAG: ' + TAG);
+    if (debug) console.log("TAG: " + TAG);
     var TAGData = TAG.slice(10, TAG.length);
-    if (debug) console.log('TAGData: ' + TAGData);
+    if (debug) console.log("TAGData: " + TAGData);
 
     var idSonde = TAGData.slice(0, 8);
-    if (debug) console.log('idSonde: ' + idSonde);
+    if (debug) console.log("idSonde: " + idSonde);
     var batteryVoltage = hexToInt(TAGData.slice(10, 14));
-    if (debug) console.log('batteryVoltage: ' + batteryVoltage / 1000+ 'V');
+    if (debug) console.log("batteryVoltage: " + batteryVoltage / 1000 + "V");
     var temperature = hexToInt(TAGData.slice(14, 18));
-    if (debug) console.log('temperature: ' + temperature / 10+ '°C');
+    if (debug) console.log("temperature: " + temperature / 10 + "°C");
     var humidity = hexToInt(TAGData.slice(18, 20));
-    if (debug) console.log('humidity: ' + humidity + '%');
+    if (debug) console.log("humidity: " + humidity + "%");
     var rssi = hexToInt(TAGData.slice(20, 22));
-    if (debug) console.log('rssi: ' + rssi + 'dBm');
+    if (debug) console.log("rssi: " + rssi + "dBm");
 
     return {
       idSonde: idSonde,
@@ -103,7 +107,7 @@ function parseHexData(hexString) {
       rssi: rssi,
     };
   } else {
-    return false
+    return false;
   }
 }
 // Envois des données à la base de données MySQL
@@ -134,8 +138,7 @@ const insertDataIntoDatabase = async (
     ];
 
     await db.query(query, values);
-    console.log("Données insérées dans la base de données");
-
+    if (debug) console.log("Données insérées dans la base de données");
   } catch (error) {
     console.error(
       "Erreur lors de l'insertion des données dans la base de données:",
@@ -154,7 +157,10 @@ const fetchDataAndProcess = async () => {
     rawData.map(async (item) => {
       const [idReleve, hexData, dateReleve] = item;
 
-      if (debug) console.log("-------------------------------------------------------------------------------------------------------------------------------------");
+      if (debug)
+        console.log(
+          "-------------------------------------------------------------------------------------------------------------------------------------"
+        );
       if (debug) console.log("Récupération des données depuis l'API");
       if (debug) console.log("idReleve :", idReleve);
       if (debug) console.log("hexData :", hexData);
@@ -168,10 +174,12 @@ const fetchDataAndProcess = async () => {
         }
 
         if (hasDuplicate) {
-          
-          console.log("Doublon détecté, les données ne seront pas envoyées.");
-          if (debug) console.log("idReleve :", idReleve, "hexData :", hexData,);
-          if (debug) console.log("-------------------------------------------------------------------------------------------------------------------------------------");
+          if (debug) console.log("Doublon détecté, les données ne seront pas envoyées.");
+          if (debug) console.log("idReleve :", idReleve, "hexData :", hexData);
+          if (debug)
+            console.log(
+              "-------------------------------------------------------------------------------------------------------------------------------------"
+            );
         } else {
           // Traitement des données
           const data = parseHexData(hexData);
@@ -183,19 +191,24 @@ const fetchDataAndProcess = async () => {
           // Insérer les données dans la base de données
           if (!data) {
             console.error('The "' + hexData + '" data is not valid');
+          } else if (data.idSonde == undefined || data.idSonde == 0 || data.idSonde == null || data.idSonde == "" || data.idSonde == "NaN" || data.temperature == undefined || data.temperature == 0 || data.temperature == null || data.temperature == "" || data.temperature == "NaN" || data.humidity == undefined || data.humidity == 0 || data.humidity == null || data.humidity == "" || data.humidity == "NaN" || data.batteryVoltage == undefined || data.batteryVoltage == 0 || data.batteryVoltage == null || data.batteryVoltage == "" || data.batteryVoltage == "NaN" || data.rssi == undefined || data.rssi == 0 || data.rssi == null || data.rssi == "" || data.rssi == "NaN") {
+            console.error('The "' + hexData + '" as not been parsed correctly');
           } else {
-          insertDataIntoDatabase(
-            idReleve,
-            data.idSonde,
-            data.temperature,
-            data.humidity,
-            data.batteryVoltage,
-            data.rssi,
-            formattedDate,
-            hexData
-          );
+            insertDataIntoDatabase(
+              idReleve,
+              data.idSonde,
+              data.temperature,
+              data.humidity,
+              data.batteryVoltage,
+              data.rssi,
+              formattedDate,
+              hexData
+            );
           }
-          if (debug) console.log("-------------------------------------------------------------------------------------------------------------------------------------");
+          if (debug)
+            console.log(
+              "-------------------------------------------------------------------------------------------------------------------------------------"
+            );
         }
       });
     });
@@ -204,17 +217,15 @@ const fetchDataAndProcess = async () => {
   }
 };
 
-
 // Démarrage du serveur
 connectDb;
 fetchDataAndProcess();
 setInterval(fetchDataAndProcess, 60000);
 
-
 // Endpoints
-app.get('/data', (req, res) => {
-  const query = 
-  'SELECT * FROM ' + db.escapeId(config.table) + ' ORDER BY id DESC LIMIT ?';
+app.get("/data", (req, res) => {
+  const query =
+    "SELECT * FROM " + db.escapeId(config.table) + " ORDER BY id DESC LIMIT ?";
   const limit = parseInt(req.query.limit) || 10; // Paramètre optionnel pour le nombre de données à renvoyer
 
   db.query(query, [limit], (error, results) => {
@@ -223,35 +234,50 @@ app.get('/data', (req, res) => {
   });
 });
 
-app.get('/data-sse', (req, res) => {
-  res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache');
-  res.setHeader('Connection', 'keep-alive');
+app.get("/data-sse", (req, res) => {
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
 
-  const query = 'SELECT * FROM ' + db.escapeId(config.table) + ' ORDER BY id DESC LIMIT 1';
+  const query = "SELECT * FROM " + db.escapeId(config.table) + " ORDER BY id DESC LIMIT 1";
+  var previousData = 0;
 
-  const sendUpdate = () => {
+  const updateData = () => {
     db.query(query, (error, results) => {
       if (error) throw error;
       if (results.length > 0) {
-        var previousData = results[0];
-
-        if (previousData == results[0]) {
-          // Données identiques, ne pas envoyer de mise à jour
-          return;
-        } else {
-          // Données différentes, envoyer une mise à jour
-          previousData = results[0];
-          res.write(`data: ${JSON.stringify(results[0])}\n\n`);
+        if (previousData.id !== results[0].id) {
+          sendUpdate(results[0]);
         }
+        previousData = results[0];
       }
     });
   };
 
-  const intervalId = setInterval(sendUpdate, 60000); // Envoie une mise à jour toutes les 60 secondes
+  const sendUpdate = (data) => {
+    if (data !== 0) {
+      var sendData = JSON.stringify(data)
+      if (debug) console.log(sendData)
+      if (debug) console.log("----------------------------------------------------------------------------------")
+      res.write(sendData)
+    };
+  };
 
-  req.on('close', () => {
+  updateData();
+  const intervalId = setInterval(updateData, 60000); // Envoie une mise à jour toutes les 60 secondes
+
+  req.on("close", () => {
     clearInterval(intervalId);
+  });
+});
+
+app.get("/sondes", (req, res) => {
+  const query = "SELECT DISTINCT id_sonde FROM " + db.escapeId(config.table);
+
+  db.query(query, (error, results) => {
+    if (error) throw error;
+    const idSondes = results.map(result => result.id_sonde);
+    res.json(idSondes);
   });
 });
 
