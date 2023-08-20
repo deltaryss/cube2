@@ -1,9 +1,15 @@
-# Guide de lancement de l'application:  
+# Guide de lancement de l'application: 
+Pour lancer l'application vous devez suivre les étapes suivantes:  
+- Installer NodeJS (https://nodejs.org/en/download/)  
+- Lancez la commande `npm install` dans le dossier de l'application  
+- Lancez la commande `npm run install` dans le dossier de l'application  
+- Configurer le fichier config.js (voir la section "API" pour plus d'informations)  
+- Lancez la commande `npm run start` dans le dossier de l'application  
+
 ## API:  
-Pour lancer l'api, il faut suivre les étapes suivantes:  
-- Se placer dans le dossier api  
-- Lancer la commande: npm install  
-- Ajouter le fichier "config.js" avec le contenu suivant:  
+Pour configurer l'api vous devez créer le fichier config.js dans le dossier "api" ou bien modifier le fichier config-template.js et le renommer en config.js.  
+Le fichier config-template.js est un guide pour vous aider à configuer l'api.  
+Il contient les informations suivantes:  
 
 ```  
 module.exports = {  
@@ -19,17 +25,11 @@ url: '+++' // Url de l'api (retrouvable dans le fichier "Groupes_et_API_Key.xlsx
 }  
 port: +++ // Port sur lequel l'api sera lancée (nombre) (facultatif)  
 table: "+++" // Nom de la table dans la base de données  
+createTable: +++ // Créer la table dans la base de données si elle n'existe pas (true/false)
 debug: +++ // Affiche les logs de debug dans la console (true/false) (facultatif)  
 }  
 ```
-***remplacer les `+++` par les valeurs souhaitées***  
-  
-- Lancer la commande: npm start  
-- L'api est lancée sur le port 3000 par défaut (modifiable dans le fichier config.js)  
-- Par défaut, l'api est lancée sans le mode debug (affichage des logs dans la console) (modifiable dans le fichier config.js)
-
-## Application web:
-placeholder
+***Vous devez remplacer les `+++` par les valeurs souhaitées***  
 
 # Notes de developpement:
 ## API:

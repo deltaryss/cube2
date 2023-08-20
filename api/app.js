@@ -42,7 +42,7 @@ const connectDb = db.connect((err) => {
     console.error("Erreur de connexion à la base de données :", err);
   } else {
     console.log("Connecté à la base de données MySQL");
-    createMesuresTableIfNotExists();
+    if (config.createTable) createMesuresTableIfNotExists();
   }
 });
 // Vérification de doublon de données

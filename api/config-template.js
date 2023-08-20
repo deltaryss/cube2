@@ -14,5 +14,6 @@ module.exports = {
     },
     port: 0, // Port externe de l'API; Number
     table: "", // Nom de la table dans la base de données; String
+    createTable: false, // Possibilitée de créer la table si elle n'existe pas; Boolean
     debug: false, // Affiche les logs dans la console; Boolean
 };
