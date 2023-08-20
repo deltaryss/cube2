@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { GetDataService } from '../services/get-data.service';
-import { HomeBarService } from '../services/home-bar.service'; // Assurez-vous du chemin correct
+import { HomeBarService } from '../services/home-bar.service';
 
 @Component({
   selector: 'app-tab-bar',
@@ -20,12 +20,12 @@ export class TabBarComponent implements OnInit {
   getSondeList() {
     this.dataService.getSondeList().subscribe(response => {
       this.sondeList = response;
+      this.selectData(this.sondeList[0]);
     });
-
-
   }
 
   selectData(data: any) {
+    if (data == "all") {data = ""}
     console.log(data);
     this.sharedService.setSelectedData(data);
   }

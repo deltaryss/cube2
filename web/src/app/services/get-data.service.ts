@@ -14,8 +14,13 @@ export class GetDataService {
 
   constructor(private http: HttpClient) { }
 
-  getDataWithLimit(limit: number): Observable<any> {
-    const url = `${this.baseUrl}/data?limit=${limit}`;
+  getData(limit: number = 10, idSonde?: number): Observable<any> {
+    let url = `${this.baseUrl}/data?limit=${limit}`;
+
+    if (idSonde !== undefined) {
+      url += `&id_sonde=${idSonde}`;
+    }
+
     return this.http.get(url);
   }
 
@@ -24,8 +29,14 @@ export class GetDataService {
     return this.http.get(url);
   }
 
-  sseConnect(): Observable<any> {
-    this.eventSource = new EventSource(`${this.baseUrl}/data-sse`);
+  sseConnect(idSonde?: number): Observable<any> {
+    let url = `${this.baseUrl}/data-sse`;
+
+    if (idSonde !== undefined) {
+      url += `?id_sonde=${idSonde}`;
+    }
+
+    this.eventSource = new EventSource(url);
 
     this.eventSource.onmessage = (event) => {
       this.dataSubject.next(JSON.parse(event.data));

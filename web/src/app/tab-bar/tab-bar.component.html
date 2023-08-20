@@ -3,5 +3,6 @@
     <div class="sonde" *ngFor="let sonde of sondeList">
       <div class="sondeName" (click)="selectData(sonde)">{{sonde}}</div>
     </div>
+    <div class="sonde" (click)="selectData('all')">Toutes</div>
   </div>
 </div>

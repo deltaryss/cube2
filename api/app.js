@@ -224,11 +224,19 @@ setInterval(fetchDataAndProcess, 60000);
 
 // Endpoints
 app.get("/data", (req, res) => {
-  const query =
-    "SELECT * FROM " + db.escapeId(config.table) + " ORDER BY id DESC LIMIT ?";
-  const limit = parseInt(req.query.limit) || 10; // Paramètre optionnel pour le nombre de données à renvoyer
+  const id_sonde = req.query.id_sonde; // Récupère le paramètre id_sonde de la requête
+  let query = "SELECT * FROM " + db.escapeId(config.table);
 
-  db.query(query, [limit], (error, results) => {
+  if (id_sonde) {
+    query += " WHERE id_sonde = ?"; // Ajoute la condition pour id_sonde si le paramètre est fourni
+  }
+
+  query += " ORDER BY id DESC LIMIT ?";
+  
+  const limit = parseInt(req.query.limit) || 10; // Paramètre optionnel pour le nombre de données à renvoyer
+  const queryParams = id_sonde ? [id_sonde, limit] : [limit]; // Utilisez id_sonde dans les paramètres si fourni
+
+  db.query(query, queryParams, (error, results) => {
     if (error) throw error;
     res.json(results);
   });
@@ -239,11 +247,17 @@ app.get("/data-sse", (req, res) => {
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
 
-  const query = "SELECT * FROM " + db.escapeId(config.table) + " ORDER BY id DESC LIMIT 1";
-  var previousData = 0;
+  const id_sonde = req.query.id_sonde; // Récupère le paramètre id_sonde de la requête
+  let query = "SELECT * FROM " + db.escapeId(config.table);
+
+  if (id_sonde) {
+    query += " WHERE id_sonde = ?"; // Ajoute la condition pour id_sonde si le paramètre est fourni
+  }
+
+  query += " ORDER BY id DESC LIMIT 1";
 
   const updateData = () => {
-    db.query(query, (error, results) => {
+    db.query(query, id_sonde ? [id_sonde] : null, (error, results) => {
       if (error) throw error;
       if (results.length > 0) {
         if (previousData.id !== results[0].id) {
@@ -256,11 +270,11 @@ app.get("/data-sse", (req, res) => {
 
   const sendUpdate = (data) => {
     if (data !== 0) {
-      var sendData = JSON.stringify(data)
-      if (debug) console.log(sendData)
-      if (debug) console.log("----------------------------------------------------------------------------------")
-      res.write(sendData)
-    };
+      var sendData = JSON.stringify(data);
+      if (debug) console.log(sendData);
+      if (debug) console.log("----------------------------------------------------------------------------------");
+      res.write(sendData);
+    }
   };
 
   updateData();
@@ -270,6 +284,7 @@ app.get("/data-sse", (req, res) => {
     clearInterval(intervalId);
   });
 });
+
 
 app.get("/sondes", (req, res) => {
   const query = "SELECT DISTINCT id_sonde FROM " + db.escapeId(config.table);

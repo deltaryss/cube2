@@ -1,5 +1,27 @@
 <div class="home">
   <app-tab-bar class="tabbar"></app-tab-bar>
   <div class="homeBody">
+    <div class="title">
+      <p>ATMOS</p>
+      {{selectedData}}
+    </div>
+    <div class="content" id="content">
+      <canvas id="temperatureChart" class="chart tempChart"></canvas>
+      <canvas id="batteryChart" class="chart pressChart"></canvas>
+      <canvas id="humidityChart" class="chart humChart"></canvas>
+    </div>
+    <div class="bottom">
+      <p>
+        Afficher les
+        <input
+          type="number"
+          class="bottomNumberInput"
+          value="10"
+          (change)="quantityInput($event)"
+          [max]="50"
+        >
+        derniers relevés
+      </p>
+    </div>
   </div>
 </div>

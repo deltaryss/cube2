@@ -1,6 +1,11 @@
+@import "../../assets/variables.scss";
+
 .home {
   margin: 0px;
   padding: 0px;
+
+  display: flex;
+  overflow: hidden;
 
   .tabbar {
     width: 10vw;
@@ -13,5 +18,89 @@
     flex-direction: column;
     align-items: center;
 
+  }
+
+  .homeBody {
+    width: 90vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .title {
+      font-size: 2.7vw;
+      font-weight: bold;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      vertical-align: middle;
+      font-family: Rajdhani;
+      color: $main-color;
+      > * {
+        margin: 1vh;
+      }
+    }
+
+    .content::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    .content::-webkit-scrollbar-thumb {
+      background: #dae6e9;
+      border-radius: 10px;
+    }
+
+    .content::-webkit-scrollbar-track {
+      box-shadow: inset 0 0 5px grey;
+      border-radius: 10px;
+    }
+
+    .content {
+      overflow-y: scroll;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+
+      .chart {
+        width: 100%;
+        height: 50vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: 2vw;
+        font-family: Rajdhani;
+        color: $main-color;
+        > * {
+          margin: 1vh;
+        }
+      }
+    }
+
+    .bottom {
+      width: 100%;
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-size: 2vw;
+      font-family: Rajdhani;
+
+      .bottomNumberInput {
+        width: 3vw;
+        height: 1.5vw;
+        border-radius: 5px;
+        border: none;
+        padding: 5px;
+        font-size: 20px;
+        font-family: Rajdhani;
+        font-size: 2.8vh;
+      }
+    }
   }
 }
