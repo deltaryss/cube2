@@ -15,7 +15,7 @@ const debug = config.debug || false;
 const db = mysql.createConnection(config.database);
 
 // Création de la table si elle n'existe pas
-const createMesuresTableIfNotExists = async () => {
+const createTableIfNotExists = async () => {
   try {
     const query = `
       CREATE TABLE IF NOT EXISTS ${config.table} (
@@ -42,7 +42,7 @@ const connectDb = db.connect((err) => {
     console.error("Erreur de connexion à la base de données :", err);
   } else {
     console.log("Connecté à la base de données MySQL");
-    if (config.createTable) createMesuresTableIfNotExists();
+    if (config.createTable) createTableIfNotExists();
   }
 });
 // Vérification de doublon de données

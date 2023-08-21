@@ -2,7 +2,6 @@
 Pour lancer l'application vous devez suivre les étapes suivantes:  
 - Installer NodeJS (https://nodejs.org/en/download/)  
 - Lancez la commande `npm install` dans le dossier de l'application  
-- Lancez la commande `npm run install` dans le dossier de l'application  
 - Configurer le fichier config.js (voir la section "API" pour plus d'informations)  
 - Lancez la commande `npm run start` dans le dossier de l'application  
 
@@ -14,11 +13,11 @@ Il contient les informations suivantes:
 ```  
 module.exports = {  
 database: {  
-host: '+++', // Adresse du serveur (localhost si le serveur est local)  
-user: '+++', // Utilisateur de la base de données  
-password: '+++', // Mot de passe de l'utilisateur  
-database: '+++' // Nom de la base de données  
-port: +++ // Port de la base de données  
+host: 'localhost', // Adresse du serveur (localhost si le serveur est local)  
+user: 'api', // Utilisateur de la base de données  
+password: 'api', // Mot de passe de l'utilisateur  
+database: 'cube2' // Nom de la base de données  
+port: 3006 // Port de la base de données  
 },  
 api: {  
 url: '+++' // Url de l'api (retrouvable dans le fichier "Groupes_et_API_Key.xlsx")  
