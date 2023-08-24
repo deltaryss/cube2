@@ -2,9 +2,8 @@
 Pour lancer l'application vous devez suivre les étapes suivantes:  
 - Installer NodeJS (https://nodejs.org/en/download/)  
 - Lancez la commande `npm install` dans le dossier de l'application  
-- Lancez la commande `npm run install` dans le dossier de l'application  
 - Configurer le fichier config.js (voir la section "API" pour plus d'informations)  
-- Lancez la commande `npm run start` dans le dossier de l'application  
+- Lancez la commande `npm start` dans le dossier de l'application  
 
 ## API:  
 Pour configurer l'api vous devez créer le fichier config.js dans le dossier "api" ou bien modifier le fichier config-template.js et le renommer en config.js.  
@@ -14,19 +13,19 @@ Il contient les informations suivantes:
 ```  
 module.exports = {  
 database: {  
-host: '+++', // Adresse du serveur (localhost si le serveur est local)  
-user: '+++', // Utilisateur de la base de données  
-password: '+++', // Mot de passe de l'utilisateur  
-database: '+++' // Nom de la base de données  
-port: +++ // Port de la base de données  
+host: 'localhost', // Adresse du serveur (localhost si le serveur est local)  
+user: 'api' // Utilisateur de la base de données  
+password: 'api', // Mot de passe de l'utilisateur  
+database: 'atmosDB' // Nom de la base de données  
+port: 3306 // Port de la base de données  
 },  
 api: {  
-url: '+++' // Url de l'api (retrouvable dans le fichier "Groupes_et_API_Key.xlsx")  
+url: 'https://atmos.com/capteurs/api/?account=NTB37PKZUG&limit=5' // Url de l'api (retrouvable dans le fichier "Groupes_et_API_Key.xlsx")  
 }  
-port: +++ // Port sur lequel l'api sera lancée (nombre) (facultatif)  
-table: "+++" // Nom de la table dans la base de données  
-createTable: +++ // Créer la table dans la base de données si elle n'existe pas (true/false)
-debug: +++ // Affiche les logs de debug dans la console (true/false) (facultatif)  
+port: 3000 // Port sur lequel l'api sera lancée (nombre) (facultatif)  
+table: "atmos" // Nom de la table dans la base de données  
+createTable: false // Créer la table dans la base de données si elle n'existe pas (true/false) (facultatif)
+debug: false // Affiche les logs de debug dans la console (true/false) (facultatif)  
 }  
 ```
 ***Vous devez remplacer les `+++` par les valeurs souhaitées***  
